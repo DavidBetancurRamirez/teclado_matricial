@@ -26,14 +26,12 @@ string teclado[][3] = {
     {"*", "0", "#"}
 };
 
-string tecla = "";
-
-string escribir() {
+string escribir(string anterior) {
     for (int i=0; i<3; i++) {
         columnas[i] = 0;
 
         for (int j=0; j<4; j++) {
-            if (filas[j]==0 && tecla != teclado[j][i]) {
+            if (filas[j]==0 && anterior != teclado[j][i]) {
                 columnas[i] = 1;
                 return teclado[j][i];
             }
@@ -47,8 +45,11 @@ string escribir() {
 
 int main()
 {
+    string tecla = "";
+    string anterior = "";
     while (true) {
-        tecla = escribir();
+        tecla = escribir(anterior);
+        anterior = tecla;
         if (tecla!="") cout << tecla << endl;
     }
 }
