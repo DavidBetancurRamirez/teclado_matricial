@@ -26,12 +26,14 @@ string teclado[][3] = {
     {"*", "0", "#"}
 };
 
+string tecla = "";
+
 string escribir() {
     for (int i=0; i<3; i++) {
         columnas[i] = 0;
 
         for (int j=0; j<4; j++) {
-            if (filas[j]==0) {
+            if (filas[j]==0 && tecla != teclado[j][i]) {
                 columnas[i] = 1;
                 return teclado[j][i];
             }
@@ -46,8 +48,7 @@ string escribir() {
 int main()
 {
     while (true) {
-        string tecla = escribir();
+        tecla = escribir();
         if (tecla!="") cout << tecla << endl;
-        ThisThread::sleep_for(BLINKING_RATE);
     }
 }
