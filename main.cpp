@@ -162,6 +162,7 @@ void menu() {
 
 int main() {
     while (true) {
+        cout << "Para dar enter oprimir *" << endl;
         menu();
         cout << endl << "===============================" << endl << endl;
     }
