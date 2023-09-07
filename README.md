@@ -140,7 +140,9 @@ Se usa un objeto de tipo entrada para las filas y para las columnas se usa un ob
     }
 
 * Se le pide al usuario los coeficientes del polinomio (grado 2).
+* se procede a calcular la raiz segun la formula del estudiante.
 * En la primer asignación de R2 se halla el determinante del polinomio (R2 = CB*CB - 4*CA*CC).
+* se usa la misma variable (R2) primero para el determinante y luego para la raiz para ahorrar memoria.
 * Si es negativo significa que no tiene raices reales.
 * En caso de ser positivo, se muestran las raices del polinomio.
 
@@ -169,6 +171,8 @@ Se usa un objeto de tipo entrada para las filas y para las columnas se usa un ob
     }
 
 Se asigna una letra segun la calificación ingresada.
+Se generan las restricciones de más restrictivo a menos restrictivo para reducir el
+numero de restricciones que se deben hacer
 
 ### Opción 3
     void Leds() {
