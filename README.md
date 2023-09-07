@@ -3,11 +3,14 @@
 **Metodo principal:**
 
     int main() {
-       while (true) {
-           cout << "Para dar enter oprimir *" << endl;
-           menu();
-           cout << endl << "===============================" << endl << endl;
-       }
+        while (true) {
+            cout << "-----------------------" << endl;
+            cout << "Para dar enter oprimir *" << endl;
+            cout << "Para eliminar oprimir #" << endl;
+            cout << "-----------------------" << endl;
+            menu();
+            cout << endl << "===============================" << endl << endl;
+        }
     }
 
 Da estilo para la consola entre el llamado del metodo menu.
@@ -66,50 +69,58 @@ Se usa un objeto de tipo entrada para las filas y para las columnas se usa un ob
 **Función para leer el teclado matricial:**
 
     string tecladoMatricial() {
-       ThisThread::sleep_for(BLINKING_RATE);
-   
-       for (int i=0; i<3; i++) {
-           columnas[i] = 0;
-   
-           for (int j=0; j<4; j++) {
-               if (filas[j]==0) {
-                   columnas[i] = 1;
-                   return teclado[j][i];
-               }
-           }
-   
-           columnas[i] = 1;
-       }
-   
-       return "";
+        for (int i=0; i<3; i++) {
+            columnas[i] = 0;
+    
+            for (int j=0; j<4; j++) {
+                if (filas[j]==0) {
+                    while (filas[j]==0);
+                    columnas[i] = 1;
+                    return teclado[j][i];
+                }
+            }
+    
+            columnas[i] = 1;
+        }
+    
+        return "";
     }
 
 * Como se debe usar inputs para las filas y outputs para las columnas, se hace un for por cada columna asignando un valor de 0 para por asi decirlo "cerrar el circuito", luego se recorren las filas y en el caso de que la fila tambien tenga el valor de 0, se puede determinar cual es la posición del teclado que se esta presionando.
 * Es necesario devolver la columna con el valor 1, ya que de lo contrario siempre se tomaria el valor de la primer columna.
-* Contiene un tiempo de espera entre presionar las teclas de 300ms.
+* Se usa un while para que no aparezca en pantalla hasta que se suelte la tecla
 
 ---
 **Función complementaria para leer el teclado:**
 
     string escribir() {
-       string tecla = "";
-       string input = "";
-   
-       while (tecla!="*") {
-           tecla = tecladoMatricial();
-   
-           if (tecla!="") {
-               input += tecla;
-               cout << input << endl;
-           }
-       }
-   
-       return input;
+        string tecla = "";
+        string input = "";
+    
+        while (tecla!="*") {
+            tecla = tecladoMatricial();
+    
+            if (tecla!="") {
+                if (tecla=="#") {
+                    if (input.size()!=0) input.pop_back();
+                    cout << endl << input;
+                } else {
+                    input += tecla;
+                    cout << tecla;
+                }
+                cout.flush();
+            }
+        }
+        
+        cout << endl;
+    
+        return input;
     }
 
-* Se usa '*' como un aceptar (enter)
-* El metodo va creando una cadena que se va llenando cada que se apreta una tecla, se verifica que no sea vacia y que no se halla dado enter, en el ultimo caso se devuelve el valor ingresado
-* Tambien muestra en pantalla lo que se va escribiendo
+* Se usa '*' como un aceptar (enter).
+* Se usa '#' para eliminar el ultimo caracter (delete).
+* El metodo va creando una cadena que se va llenando cada que se apreta una tecla.
+* Muestra en pantalla lo que se va escribiendo
 
 ## Opciones
 ### Opción 1
@@ -176,41 +187,51 @@ numero de restricciones que se deben hacer
 
 ### Opción 3
     void Leds() {
-       cout << "Introduzca un codigo hexadecimal: " << endl;
-   
-       string color = escribir();
-   
-       colorLed(color);
+        // Inicializando leds
+        PwmOut ledR(LED1);
+        PwmOut ledG(LED2);
+        PwmOut ledB(LED3);
+    
+        // Determinar periodo de los leds
+        ledR.period(0.01);
+        ledG.period(0.01);
+        ledB.period(0.01);
+        
+        // Obtener los colores
+        cout << "Introduzca la intensidad del rojo (R): " << endl;
+        float red = stoi(escribir());
+    
+        while (red>255) {
+            cout << "Introduzca una intensidad dentro del rango (0-255): " << endl;
+            red = stoi(escribir());
+        }
+    
+        cout << "Introduzca la intensidad del verde (G): " << endl;
+        float green = stoi(escribir());
+    
+        while (green>255) {
+            cout << "Introduzca una intensidad dentro del rango (0-255): " << endl;
+            green = stoi(escribir());
+        }
+    
+        cout << "Introduzca la intensidad del azul (B): " << endl;
+        float blue = stoi(escribir());
+    
+        while (blue>255) {
+            cout << "Introduzca una intensidad dentro del rango (0-255): " << endl;
+            blue = stoi(escribir());
+        }
+    
+        // Calcular valor de color
+        float scaledRed = red / 255;
+        float scaledGreen = green / 255;
+        float scaledBlue = blue / 255;
+    
+        // Asignar valor de color a los leds
+        ledR = 1 - scaledRed;
+        ledG = 1 - scaledGreen;
+        ledB = 1 - scaledBlue;
     }
 
-Le pide al usuario un valor hexadecimal y le envia dicho valor a la funcion colorLed().
-
----
-**Metodo para cambiar el color del led:**
-
-    void colorLed(string hexValue) {
-       // Inicializando leds
-       PwmOut ledR(LED1);
-       PwmOut ledG(LED2);
-       PwmOut ledB(LED3);
-   
-       // Determinar periodo de los leds
-       ledR.period(0.01);
-       ledG.period(0.01);
-       ledB.period(0.01);
-   
-       // Calcular valor de color
-       unsigned int colorValue = stoi(hexValue, nullptr, 16);
-       unsigned char red, green, blue;
-       red = (1-(float)((colorValue >> 16) & 0xFF) / 255.0f);
-       green = (1-(float)((colorValue >> 8) & 0xFF) / 255.0f);
-       blue = (1-(float)(colorValue & 0xFF) / 255.0f);
-   
-       // Asignar valor de color a los leds
-       ledR = red;
-       ledG = green;
-       ledB = blue;
-    }
-
-* Recibe el color hexadecimal al cual cambiar el led.
-* Crea los leds R-G-B por separado para luego asignarles el valor correspondiente.
+* Se crean los objetos del led separandos, para el R-G-B.
+* Se le pide al usuario un valor de 0 a 255 por color para dar esa tonalidad y todos juntos dan el color deseado.
