@@ -27,13 +27,12 @@ string teclado[][3] = {
 };
 
 string tecladoMatricial() {
-    ThisThread::sleep_for(BLINKING_RATE);
-
     for (int i=0; i<3; i++) {
         columnas[i] = 0;
 
         for (int j=0; j<4; j++) {
             if (filas[j]==0) {
+                while (filas[j]==0);
                 columnas[i] = 1;
                 return teclado[j][i];
             }
@@ -53,36 +52,20 @@ string escribir() {
         tecla = tecladoMatricial();
 
         if (tecla!="") {
-            input += tecla;
-            cout << input << endl;
+            if (tecla=="#") {
+                if (input.size()!=0) input.pop_back();
+                cout << endl << input;
+            } else {
+                input += tecla;
+                cout << tecla;
+            }
+            cout.flush();
         }
     }
+    
+    cout << endl;
 
     return input;
-}
-
-void colorLed(string hexValue) {
-    // Inicializando leds
-    PwmOut ledR(LED1);
-    PwmOut ledG(LED2);
-    PwmOut ledB(LED3);
-
-    // Determinar periodo de los leds
-    ledR.period(0.01);
-    ledG.period(0.01);
-    ledB.period(0.01);
-
-    // Calcular valor de color
-    unsigned int colorValue = stoi(hexValue, nullptr, 16);
-    unsigned char red, green, blue;
-    red = (1-(float)((colorValue >> 16) & 0xFF) / 255.0f);
-    green = (1-(float)((colorValue >> 8) & 0xFF) / 255.0f);
-    blue = (1-(float)(colorValue & 0xFF) / 255.0f);
-
-    // Asignar valor de color a los leds
-    ledR = red;
-    ledG = green;
-    ledB = blue;
 }
 
 void raices() {
@@ -131,11 +114,50 @@ void calificacion() {
 }
 
 void Leds() {
-    cout << "Introduzca un codigo hexadecimal: " << endl;
+    // Inicializando leds
+    PwmOut ledR(LED1);
+    PwmOut ledG(LED2);
+    PwmOut ledB(LED3);
 
-    string color = escribir();
+    // Determinar periodo de los leds
+    ledR.period(0.01);
+    ledG.period(0.01);
+    ledB.period(0.01);
+    
+    // Obtener los colores
+    cout << "Introduzca la intensidad del rojo (R): " << endl;
+    float red = stoi(escribir());
 
-    colorLed(color);
+    while (red>255) {
+        cout << "Introduzca una intensidad dentro del rango (0-255): " << endl;
+        red = stoi(escribir());
+    }
+
+    cout << "Introduzca la intensidad del verde (G): " << endl;
+    float green = stoi(escribir());
+
+    while (green>255) {
+        cout << "Introduzca una intensidad dentro del rango (0-255): " << endl;
+        green = stoi(escribir());
+    }
+
+    cout << "Introduzca la intensidad del azul (B): " << endl;
+    float blue = stoi(escribir());
+
+    while (blue>255) {
+        cout << "Introduzca una intensidad dentro del rango (0-255): " << endl;
+        blue = stoi(escribir());
+    }
+
+    // Calcular valor de color
+    float scaledRed = red / 255;
+    float scaledGreen = green / 255;
+    float scaledBlue = blue / 255;
+
+    // Asignar valor de color a los leds
+    ledR = 1 - scaledRed;
+    ledG = 1 - scaledGreen;
+    ledB = 1 - scaledBlue;
 }
 
 void menu() {
@@ -162,7 +184,10 @@ void menu() {
 
 int main() {
     while (true) {
+        cout << "-----------------------" << endl;
         cout << "Para dar enter oprimir *" << endl;
+        cout << "Para eliminar oprimir #" << endl;
+        cout << "-----------------------" << endl;
         menu();
         cout << endl << "===============================" << endl << endl;
     }
